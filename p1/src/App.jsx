@@ -1,4 +1,5 @@
-import React from "react"
+import React from "react";
+import LembreteEntrada from "./LembreteEntrada";
 
 class App extends React.Component {
   render() {
@@ -6,17 +7,13 @@ class App extends React.Component {
       <>
         <div className="card">
           <div className="card-body">
-            <div className="row">
-              <div className="col-12">
-                <p className="text-center fs-4"> Hello Lembretes</p>
-
-              </div>
-            </div>
+            <div className="col-12"></div>
+            <LembreteEntrada />
           </div>
         </div>
       </>
-    )
+    );
   }
 }
 
-export default App
+export default App;
