@@ -23,7 +23,7 @@ export class LembreteEntrada extends React.Component {
         <input
           className="w-50 text-center fs-4 mb-4 border border-primary rounded"
           placeholder="Digite seu  novo lembrete"
-          value={this.props.novoLembrete}
+          value={this.props.novoLembrete }
           onChange={this.props.eventoDeMudanca}
         />
         <button
