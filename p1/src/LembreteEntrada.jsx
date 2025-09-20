@@ -1,21 +1,6 @@
 import React from "react";
 
 export class LembreteEntrada extends React.Component {
-  timer = null;
-  state = {
-    aguardar: false,
-  }
-
-  componentDidMount(){
-    this.timer = setInterval(() => {
-        this.setState({ aguardar: true});
-
-    },  100)
-  }
-
-  componentWillUnmount(){
-    clearInterval(this.timer);
-  }
 
   render() {
     return (

@@ -12,15 +12,34 @@ class App extends React.Component {
     this.setState({ valorLembrete: evento.target.value });
   };
 
+  adicionarfavorito = (codigo) => {
+    this.setState((estado) => ({
+      lembrete: estado.lembrete.map((lb) => {
+        lb.codigo === codigo ? (lb.favorito = true) : lb;
+        return lb;
+      }),
+    }));
+  };
+
+  removerFavorito = (codigo) => {
+    this.setState((estado) => ({
+      lembrete: estado.lembrete.map((lb) => {
+        lb.codigo === codigo ? (lb.favorito = false) : lb;
+        return lb;
+      }),
+    }));
+  };
+
   adicionarLembrete = () => {
     const texto = this.state.valorLembrete;
     const novoLembrete = {
       codigo: Math.random() * 16,
       texto: texto,
+      favorito: false,
     };
     this.setState((estado) => ({
       lembrete: estado.lembrete.concat(novoLembrete),
-      valorLembrete: "",
+      valorLembrete: ""
     }));
   };
 
@@ -39,14 +58,18 @@ class App extends React.Component {
             <LembreteLista
               lembrete={this.state.lembrete}
               removerLembrete={this.removerLembrete}
+              adicionarfavorito={this.adicionarfavorito}
+              removerFavorito={this.removerFavorito}
             />
           </div>
 
-          <LembreteEntrada
-            adicionarLembrete={this.adicionarLembrete}
-            novoLembrete={this.state.valorLembrete}
-            eventoDeMudanca={this.eventoDeMudanca}
-          />
+          <div className="mb-5">
+            <LembreteEntrada
+              adicionarLembrete={this.adicionarLembrete}
+              novoLembrete={this.state.valorLembrete}
+              eventoDeMudanca={this.eventoDeMudanca}
+            />
+          </div>
         </div>
       </div>
     );

@@ -1,7 +1,18 @@
-const BotaoPersonalizado = (props) => {
-  return (
-  <i className={`fa-${props.tipo} fa-${props.nome} fa-${props.tamanho} `} style={{cursor: "pointer"}} onClick={props.removerLembrete}></i>
-  );
-};
+import React from "react";
+export class BotaoPersonalizado extends React.Component {
+  render() {
+    return (
+      <i
+        className={`fa-${this.props.tipo} fa-${this.props.nome} fa-${this.props.tamanho} `}
+        style={{ cursor: "pointer" }}
+        onClick={
+          this.props.removerLembrete ||
+          this.props.adicionarFavorito ||
+          this.props.removerFavorito
+        }
+      ></i>
+    );
+  }
+}
 
 export default BotaoPersonalizado;
