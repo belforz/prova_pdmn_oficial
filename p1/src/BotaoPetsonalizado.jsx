@@ -4,11 +4,11 @@ export class BotaoPersonalizado extends React.Component {
     return (
       <i
         className={`fa-${this.props.tipo} fa-${this.props.nome} fa-${this.props.tamanho} `}
-        style={{ cursor: "pointer" }}
+        style={{ cursor: "pointer", color: this.props.cor }}
         onClick={
           this.props.removerLembrete ||
           this.props.adicionarFavorito ||
-          this.props.removerFavorito
+          this.props.removerFavorito || this.props.filtrarFavorito
         }
       ></i>
     );

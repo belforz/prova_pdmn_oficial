@@ -1,11 +1,14 @@
 import React from "react";
 import LembreteEntrada from "./LembreteEntrada";
 import LembreteLista from "./LembreteLista";
+import { BotaoFavorito } from "./BotaoFavorito";
+import Figura from "./Figura";
 
 class App extends React.Component {
   state = {
     lembrete: [],
     valorLembrete: "",
+    somenteFavoritos: false
   };
 
   eventoDeMudanca = (evento) => {
@@ -49,14 +52,43 @@ class App extends React.Component {
     }));
   };
 
+  filtrarFavorito = () =>{
+    this.setState((estado) => ({
+      somenteFavoritos: !estado.somenteFavoritos
+    }))
+  }
+
+
+
   render() {
-    console.log(this.state);
+    const listaDeLembretes = this.state.somenteFavoritos
+    ? this.state.lembrete.filter(lb => lb.favorito === true)
+    : this.state.lembrete;
+
+    console.log(this.state)
+
     return (
       <div className="col-12 col-md-8 col-lg-6">
-        <div className="card">
+        <div className="d-flex justify-content-between mb-2">
+        <Figura tipo={"solid"} nome={"hippo"} tamanho={"4x"} cor={"#49eebb"} />
+        <Figura tipo={"solid"} nome={"cat"} tamanho={"4x"} cor={"#49eebb"} sentido={"horizontal"} />
+
+        </div>
+        <div className="card ms-2">
           <div className="card-body">
+            <div className="row d-flex justify-content-center">
+              <div className="w-50 border border rounded mb-2 bg-light">
+              <p className="text-center fs-3">
+                Aplicativo de Lembrete em <Figura tipo={"brands"} nome={"react"} cor={"#49eebb"} />
+              </p>
+
+              </div>
+            </div>
+            <div className="d-flex justify-content-end">
+              <BotaoFavorito filtrarFavorito={this.filtrarFavorito}/>
+            </div>
             <LembreteLista
-              lembrete={this.state.lembrete}
+              lembrete={listaDeLembretes}
               removerLembrete={this.removerLembrete}
               adicionarfavorito={this.adicionarfavorito}
               removerFavorito={this.removerFavorito}

@@ -19,6 +19,7 @@ class LembreteLista extends React.Component {
                       tipo={"regular"}
                       nome={"star"}
                       tamanho={"2x"}
+                      cor={"#f5eccc"}
                       adicionarFavorito={() => {
                         this.props.adicionarfavorito(lb.codigo);
                       }}
@@ -28,6 +29,7 @@ class LembreteLista extends React.Component {
                       tipo={"solid"}
                       nome={"star"}
                       tamanho={"2x"}
+                      cor={"#ffd43b"}
                       adicionarFavorito={() =>
                         this.props.removerFavorito(lb.codigo)
                       }
@@ -38,6 +40,7 @@ class LembreteLista extends React.Component {
                     tipo={"solid"}
                     nome={"trash"}
                     tamanho={"2x"}
+                    cor={"#74c0fc"}
                     removerLembrete={() =>
                       this.props.removerLembrete(lb.codigo)
                     }
