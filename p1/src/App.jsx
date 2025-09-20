@@ -2,18 +2,33 @@ import React from "react";
 import LembreteEntrada from "./LembreteEntrada";
 import LembreteLista from "./LembreteLista";
 
-const Dados = [
-  { lembrete_um: "Preparar aula de programação" },
-  { lembrete_dois: "Fazer Feura" },
-  { lembrete_tres: "Preparar marmitas" },
-];
-
 class App extends React.Component {
   state = {
-    lembrete_um: Dados[0].lembrete_um,
-    lembrete_dois: Dados[1].lembrete_dois,
-    lembrete_tres: Dados[2].lembrete_tres,
-  };
+    lembrete: [],
+    valorLembrete: "",
+  }
+
+  eventoDeMudanca = (event) => {
+    this.setState({valorLembrete: event.target.value})
+  }
+
+  adicionarLembrete = () => {
+    const texto = this.state.valorLembrete
+    const novoLembrete = {
+      id: Math.random() * 16,
+      texto: texto
+    }
+    this.setState(estado => ({
+      lembrete: estado.lembrete.concat(novoLembrete),
+      valorLembrete: ""
+    }));
+
+   
+
+    
+  }
+
+  
 
   render() {
     return (
@@ -21,14 +36,10 @@ class App extends React.Component {
         <div className="card">
           <div className="card-body">
             <div className="col-12">
-              <LembreteLista
-                lembrete_um={this.state.lembrete_um}
-                lembrete_dois={this.state.lembrete_dois}
-                lembrete_tres={this.state.lembrete_tres}
-              />
+              <LembreteLista lembrete={this.state.lembrete}/>
             </div>
             <div className="col-12">
-              <LembreteEntrada />
+              <LembreteEntrada adicionarLembrete={this.adicionarLembrete} novoLembrete={this.state.valorLembrete} eventoDeMudanca={this.eventoDeMudanca} />
             </div>
           </div>
         </div>
