@@ -40,10 +40,19 @@ class App extends React.Component {
       texto: texto,
       favorito: false,
     };
-    this.setState((estado) => ({
-      lembrete: estado.lembrete.concat(novoLembrete),
-      valorLembrete: ""
-    }));
+
+    this.setState((estado) => {
+      const copiaLista = [];
+      for (let i = 0; i < estado.lembrete.length; i++) {
+        copiaLista.push(estado.lembrete[i]);
+      }
+      copiaLista.push(novoLembrete);
+
+      return {
+        lembrete: copiaLista,
+        valorLembrete: "",
+      };
+    });
   };
 
   removerLembrete = (codigo) => {
