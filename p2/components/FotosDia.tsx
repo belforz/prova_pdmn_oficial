@@ -1,12 +1,14 @@
 import { View, StyleSheet, Text, FlatList } from "react-native";
 import ImagemDia from "./static/ImageDia";
 
-export default function FotosDia(props: {
-  imagem: { data: string; src: string }[];
-}) {
+interface Props {
+  imagem: { data: string; src: string, titulo: string }[];
+}
+
+export default function FotosDia(props: Props) {
   return (
     <View style={styles.componentFotosDia}>
-      <Text style={styles.texto}> Fotos do dia</Text>
+      <Text style={styles.texto}>Fotos do dia</Text>
       <View style={styles.listaDia}>
         <FlatList
           data={props.imagem}
@@ -14,7 +16,7 @@ export default function FotosDia(props: {
           columnWrapperStyle={styles.wrapperColuna}
           renderItem={({ item }) => (
             <View style={styles.itemLista}>
-              <ImagemDia data={item.data} src={item.src} />
+              <ImagemDia data={item.data} src={item.src} titulo={item.titulo} />
             </View>
           )}
           keyExtractor={(item, index) => index.toString()}
@@ -39,7 +41,7 @@ const styles = StyleSheet.create({
   texto: {
     fontSize: 20,
     fontWeight: "bold",
-    color: "#173B80",
+    color: "#04540cff",
     textAlign: "center",
   },
   itemLista: {
