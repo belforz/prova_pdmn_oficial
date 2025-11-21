@@ -8,6 +8,7 @@ import {
 } from "react-native";
 import { useState } from "react";
 import ImagemPesquisa from "./static/ImagePesquisa";
+import { Loading } from "./static/Loading";
 import Figura from "./static/Figura";
 
 export default function BuscaFotos(props: {
@@ -17,21 +18,29 @@ export default function BuscaFotos(props: {
     anoAtual: string;
     buscarFotos: { titulo: string; descricao: string; src: string }[];
     eventoDeMudanca: (evento: any) => void;
-    onBuscar: (query: string, year: string) => void
+    onBuscar: (query: string, year: string) => void;
+    loading: boolean;
   };
 }) {
   const [anoSelecionado, setAnoSelecionado] = useState<string | null>(null);
+  const [inputFocado, setInputFocado] = useState<boolean>(false);
   const anos = Array.from({ length: 4}, (_, i) => (parseInt(props.buscaFotos.anoAtual) - 4 + i).toString())
   
   return (
     <>
     <View style={styles.container}>
       <TextInput
-        style={styles.input}
+        style={[styles.input, inputFocado ? styles.inputSelecionado : null]}
         value={props.buscaFotos.textoBusca}
         onChangeText={props.buscaFotos.setTextoBusca}
         onChange={props.buscaFotos.eventoDeMudanca}
         placeholder="Digite o que deseja buscar (ex: moon, earth)"
+        onFocus={() => {
+          setInputFocado(true);
+        }}
+        onBlur={() => {
+          setInputFocado(false);
+        }}
       />
 
 
@@ -80,23 +89,26 @@ export default function BuscaFotos(props: {
 
     </View>
     <View style={styles.listaImagensContainer}>
-      <FlatList
-        data={props.buscaFotos.buscarFotos}
-        numColumns={2}
-        columnWrapperStyle={styles.wrapperColuna}
-        contentContainerStyle={styles.imagemConteudo}
-        renderItem={({ item }) => (
-          <View style={styles.itemImagem}>
-            <ImagemPesquisa
-              src={item.src}
-              titulo={item.titulo}
-              descricao={item.descricao}
-            />
-          </View>
-        )}
-        keyExtractor={(item, index) => index.toString()}
-      />
-
+      {props.buscaFotos.loading ? (
+        <Loading texto="Buscando fotos..." />
+      ) : (
+        <FlatList
+          data={props.buscaFotos.buscarFotos}
+          numColumns={2}
+          columnWrapperStyle={styles.wrapperColuna}
+          contentContainerStyle={styles.imagemConteudo}
+          renderItem={({ item }: { item: { titulo: string; descricao: string; src: string } }) => (
+            <View style={styles.itemImagem}>
+              <ImagemPesquisa
+                src={item.src}
+                titulo={item.titulo}
+                descricao={item.descricao}
+              />
+            </View>
+          )}
+          keyExtractor={(item: { titulo: string; descricao: string; src: string }, index: number) => index.toString()}
+        />
+      )}
     </View>
     </>
     
@@ -134,6 +146,10 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginBottom: 12,
     backgroundColor: "#fafafa",
+  },
+  inputSelecionado: {
+    borderColor: "#1E9435",
+    borderWidth: 2,
   },
   buscarTexto: {
     color: "#fff",

@@ -7,6 +7,7 @@ import React, { Component } from 'react';
 import Footer from './components/static/Footer';
 import nasaClient from './utils/nasaClient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Loading } from './components/static/Loading';
 
 interface fotoDia {
   date: string;
@@ -24,6 +25,8 @@ interface State {
   buscarFotos: { titulo: string; descricao: string; src: string }[];
   anoAtual: string;
   textoBusca: string; 
+  loadingDia: boolean;
+  loadingBusca: boolean;
 }
 
 
@@ -36,7 +39,9 @@ export default class App extends React.Component<{}, State> {
       historico: [],
       buscarFotos: [],
       anoAtual: new Date().getFullYear().toString(),
-      textoBusca: ""
+      textoBusca: "",
+      loadingDia: false,
+      loadingBusca: false
     };
   }
 
@@ -91,47 +96,61 @@ export default class App extends React.Component<{}, State> {
   }
 
   trazerDoBackImagens = async () => {
-      const hoje = this.obterDataAtual();
-      const anteanteontem = new Date(hoje);
-      anteanteontem.setDate(hoje.getDate() - 6);
-      
-      const start_date = anteanteontem.toISOString().split('T')[0];
-      const end_date = hoje.toISOString().split('T')[0];
-      
-      const response = await nasaClient.get(`/apod?start_date=${start_date}&end_date=${end_date}`);
-      const data = response.data;
-      console.log('Fotos buscadas:', data);
+      this.setState({ loadingDia: true });
+      try {
+        const hoje = this.obterDataAtual();
+        const anteanteontem = new Date(hoje);
+        anteanteontem.setDate(hoje.getDate() - 6);
+        
+        const start_date = anteanteontem.toISOString().split('T')[0];
+        const end_date = hoje.toISOString().split('T')[0];
+        
+        const response = await nasaClient.get(`/apod?start_date=${start_date}&end_date=${end_date}`);
+        const data = response.data;
+        console.log('Fotos buscadas:', data);
 
-      const fotosDoDia: fotoDia[] = [];
-      data.forEach((item: any) => {
-        fotosDoDia.push({
-          date: item.date,
-          url: item.url,
-          title: item.title
+        const fotosDoDia: fotoDia[] = [];
+        data.forEach((item: any) => {
+          fotosDoDia.push({
+            date: item.date,
+            url: item.url,
+            title: item.title
+          });
         });
-      });
-      
-      this.setState({ imagem: fotosDoDia });
+        
+        this.setState({ imagem: fotosDoDia });
 
-      if (fotosDoDia.length > 0) {
-        const fotoHoje = fotosDoDia[fotosDoDia.length - 1];
-        this.atualizarHistorico(fotoHoje);
+        if (fotosDoDia.length > 0) {
+          const fotoHoje = fotosDoDia[fotosDoDia.length - 1];
+          this.atualizarHistorico(fotoHoje);
+        }
+      } catch (error) {
+        console.error('Erro ao buscar imagens:', error);
+      } finally {
+        this.setState({ loadingDia: false });
       }
   }
 
   trazerFotosBusca = async (query: string, year: string) => {
-      const response = await nasaClient.get(`/search?q=${query}&year_start=${year}&year_end=${year}`);
-      const data = response.data.collection.items.slice(0, 10);
-      
-      const fotosBusca: { titulo: string; descricao: string; src: string }[] = [];
-      data.forEach((item: any) => {
-        fotosBusca.push({
-          titulo: item.data[0].title,
-          descricao: item.data[0].description,
-          src: item.links[0].href
-        });
-      })
-      this.setState({ buscarFotos: fotosBusca });
+      this.setState({ loadingBusca: true });
+      try {
+        const response = await nasaClient.get(`/search?q=${query}&year_start=${year}&year_end=${year}`);
+        const data = response.data.collection.items.slice(0, 10);
+        
+        const fotosBusca: { titulo: string; descricao: string; src: string }[] = [];
+        data.forEach((item: any) => {
+          fotosBusca.push({
+            titulo: item.data[0].title,
+            descricao: item.data[0].description,
+            src: item.links[0].href
+          });
+        })
+        this.setState({ buscarFotos: fotosBusca });
+      } catch (error) {
+        console.error('Erro ao buscar fotos:', error);
+      } finally {
+        this.setState({ loadingBusca: false });
+      }
   }
 
   // eventos
@@ -155,6 +174,7 @@ export default class App extends React.Component<{}, State> {
               tamanho={60}
               flip={false}
             />
+           <Text style={styles.tituloTrabalho}> Aplicativo de Imagens em <Figura tipo={"brands"} nome={"react"} cor={"#49eebb"} tamanho={60} flip={false} /></Text>
             <Figura
               tipo={"solid"}
               nome={"hippo"}
@@ -164,8 +184,7 @@ export default class App extends React.Component<{}, State> {
             />
 
         </View>
-        
-        <FotosDia imagem={this.state.imagem.map(img => ({ data: img.date, src: img.url , titulo: img.title }))}/>
+        <FotosDia imagem={this.state.imagem.map(img => ({ data: img.date, src: img.url , titulo: img.title }))} loading={this.state.loadingDia}/>
           <Image style ={styles.imagem}source={require("./assets/gatoespaco_fundo.png")} />
           
         <BuscaFotos buscaFotos={{
@@ -176,7 +195,9 @@ export default class App extends React.Component<{}, State> {
           eventoDeMudanca: this.eventoDeMudanca,
           onBuscar: (query: string, year: string) => { this.trazerFotosBusca(query, year);
           
-           }}} />
+           },
+          loading: this.state.loadingBusca
+           }}/>
            
         <Footer nome={"Leandro Belfor"} />
         {/* <Figura tipo="solid" nome="hippo" cor="#49eebb" tamanho={50} sentido="horizontal"/> */}
@@ -217,4 +238,11 @@ const styles = StyleSheet.create({
     marginBottom: 3,
     
   },
+  tituloTrabalho: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#073b0bff",
+    textAlign: "center",
+    marginBottom: 10,
+  }
 });

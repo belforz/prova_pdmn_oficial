@@ -16,9 +16,11 @@ export default function ImagemDia(props: {
 
 const styles = StyleSheet.create({
   image: {
-    width: 100,
-    height: 100,
-    resizeMode: "contain",
+    width: 140,
+    height: 140,
+    resizeMode: "cover",
+    borderRadius: 8,
+    marginVertical: 8,
   },
   data: {
     fontSize: 16,
