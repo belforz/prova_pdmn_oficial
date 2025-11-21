@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, ScrollView, Button, Pressable } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, Button, Pressable, Image } from 'react-native';
 import Figura from './components/static/Figura';
 import FotosDia from './components/FotosDia';
 import BuscaFotos from './components/BuscaFotos';
@@ -147,21 +147,27 @@ export default class App extends React.Component<{}, State> {
 
     return (
       <ScrollView contentContainerStyle={styles.container}>
+        <View style={styles.containerDosAnimais}>
         <Figura
               tipo={"solid"}
               nome={"hippo"}
               cor={"#49eebb"}
-              tamanho={24}
-              sentido="horizontal"
+              tamanho={60}
+              flip={false}
             />
             <Figura
               tipo={"solid"}
               nome={"hippo"}
               cor={"#49eebb"}
-              tamanho={24}
-              sentido="horizontal"
+              tamanho={60}
+              flip={true}
             />
+
+        </View>
+        
         <FotosDia imagem={this.state.imagem.map(img => ({ data: img.date, src: img.url , titulo: img.title }))}/>
+          <Image style ={styles.imagem}source={require("./assets/gatoespaco_fundo.png")} />
+          
         <BuscaFotos buscaFotos={{
           textoBusca: this.state.textoBusca,
           setTextoBusca:(text: string) => this.setState({ textoBusca: text }),
@@ -171,6 +177,7 @@ export default class App extends React.Component<{}, State> {
           onBuscar: (query: string, year: string) => { this.trazerFotosBusca(query, year);
           
            }}} />
+           
         <Footer nome={"Leandro Belfor"} />
         {/* <Figura tipo="solid" nome="hippo" cor="#49eebb" tamanho={50} sentido="horizontal"/> */}
         
@@ -193,8 +200,21 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 10,
   },
+  containerDosAnimais: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "60%",
+    marginTop: 10,
+  },
   buscarTexto: {
     color: "#fff",
     fontWeight: "bold",
+  },
+  imagem: {
+    width: 150,
+    height: 150,
+    marginTop: 2,
+    marginBottom: 3,
+    
   },
 });

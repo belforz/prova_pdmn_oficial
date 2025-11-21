@@ -26,11 +26,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "700",
     textAlign: "center",
+    color:"#087e4bff",
   },
   descricao: {
     fontSize: 15,
     fontStyle: "italic",
-    textAlign: "center"
+    textAlign: "center",
+    color: "#057333ff",
   }
   ,
   imagemContainer: {

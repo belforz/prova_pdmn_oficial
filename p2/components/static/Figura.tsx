@@ -6,7 +6,7 @@ export default function Figura(props: {
   cor: string;
   nome: string;
   tamanho: number;
-  sentido: string;
+  flip: boolean;
 }) {
   return (
     <View>
@@ -14,7 +14,8 @@ export default function Figura(props: {
         name={props.nome}
         size={props.tamanho}
         color={props.cor}
-        style={{ transform: [{ rotate: props.sentido }] }}
+        style={{ transform: [{ scaleX: props.flip ? -1 : 1 }] }}
+
       />
     </View>
   );

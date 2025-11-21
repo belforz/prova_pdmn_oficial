@@ -8,6 +8,7 @@ import {
 } from "react-native";
 import { useState } from "react";
 import ImagemPesquisa from "./static/ImagePesquisa";
+import Figura from "./static/Figura";
 
 export default function BuscaFotos(props: {
   buscaFotos: {
@@ -67,6 +68,16 @@ export default function BuscaFotos(props: {
         <Text style={styles.buscarTexto}>BUSCAR</Text>
       </Pressable>
     
+    </View>
+    <View style={{alignItems: "center", margin: 15}}>
+    <Figura
+                  tipo={"solid"}
+                  nome={"bugs"}
+                  cor={"#49eebb"}
+                  tamanho={70}
+                  flip={true}
+                />
+
     </View>
     <View style={styles.listaImagensContainer}>
       <FlatList
