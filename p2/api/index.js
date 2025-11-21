@@ -1,7 +1,10 @@
 require('dotenv').config()
 const express = require('express')
 const app = express()
+const cors = require('cors')
 const axios = require('axios')
+
+app.use(cors())
 
 // GET do APOD da Nasa
 app.get('/apod', async(req, res) => {
