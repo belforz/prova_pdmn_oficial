@@ -21,6 +21,7 @@ const styles = StyleSheet.create({
     resizeMode: "cover",
     borderRadius: 8,
     marginVertical: 8,
+    flexWrap: "wrap",
   },
   titulo: {
     fontSize: 16,
@@ -33,6 +34,8 @@ const styles = StyleSheet.create({
     fontStyle: "italic",
     textAlign: "center",
     color: "#057333ff",
+    flexWrap: "wrap",
+    
   }
   ,
   imagemContainer: {

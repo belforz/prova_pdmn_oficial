@@ -50,6 +50,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     width: "40%",
     marginBottom: 8,
+    flexWrap: "wrap",
   },
   titulo: {
     fontSize: 20,

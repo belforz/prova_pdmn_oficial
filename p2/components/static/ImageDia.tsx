@@ -6,7 +6,7 @@ export default function ImagemDia(props: {
   titulo: string;
 }) {
   return (
-    <View>
+    <View style={{ flexWrap: "wrap"}}>
       <Image style={styles.image} source={{ uri: props.src }}></Image>
       <Text style = {styles.data}>{props.data}</Text>
       <Text style = {styles.titulo}>{props.titulo}</Text>
