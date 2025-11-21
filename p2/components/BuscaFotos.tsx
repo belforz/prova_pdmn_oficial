@@ -13,12 +13,15 @@ export default function BuscaFotos(props: {
   buscaFotos: {
     textoBusca: string;
     setTextoBusca: (text: string) => void;
-    ano: string[];
     anoAtual: string;
     buscarFotos: { titulo: string; descricao: string; src: string }[];
+    eventoDeMudanca: (evento: any) => void;
+    onBuscar: (query: string, year: string) => void
   };
 }) {
   const [anoSelecionado, setAnoSelecionado] = useState<string | null>(null);
+  const anos = Array.from({ length: 4}, (_, i) => (parseInt(props.buscaFotos.anoAtual) - 4 + i).toString())
+  
   return (
     <>
     <View style={styles.container}>
@@ -26,16 +29,13 @@ export default function BuscaFotos(props: {
         style={styles.input}
         value={props.buscaFotos.textoBusca}
         onChangeText={props.buscaFotos.setTextoBusca}
+        onChange={props.buscaFotos.eventoDeMudanca}
         placeholder="Digite o que deseja buscar (ex: moon, earth)"
       />
 
-      <Pressable style={styles.buscarBotao} onPress={() => {}}>
-        <Text style={styles.buscarTexto}>BUSCAR</Text>
-      </Pressable>
-
 
       <FlatList
-        data={props.buscaFotos.ano}
+        data={anos}
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.anosLista}
@@ -56,8 +56,15 @@ export default function BuscaFotos(props: {
         keyExtractor={(item) => item.toString()}
       />
 
-      <Pressable style={styles.anoAtualBotao} onPress={() => {}}>
+      <Pressable style={[styles.anoAtualBotao, anoSelecionado === props.buscaFotos.anoAtual ? styles.anoAtualBotaoSelected : null]} onPress={() => setAnoSelecionado(anoSelecionado === props.buscaFotos.anoAtual ? null : props.buscaFotos.anoAtual)}>
         <Text style={styles.anoAtualTexto}>{props.buscaFotos.anoAtual}</Text>
+      </Pressable>
+
+       <Pressable style={styles.buscarBotao} onPress={() => {
+         props.buscaFotos.onBuscar(props.buscaFotos.textoBusca, anoSelecionado || props.buscaFotos.anoAtual);
+         setAnoSelecionado(null);
+       }}>
+        <Text style={styles.buscarTexto}>BUSCAR</Text>
       </Pressable>
     
     </View>
@@ -105,7 +112,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 8,
     alignItems: "center",
-    marginBottom: 10,
+    marginTop: 10,
   },
   input: {
     width: "100%",
@@ -151,10 +158,18 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: "center",
   },
-  anoAtualTexto: {
+  anoAtualTexto:{
     color: "#fff",
     fontWeight: "700",
     fontSize: 16,
+  },
+  anoAtualBotaoSelected: {
+   width: "100%",
+   paddingVertical: 12,
+   borderRadius: 8,
+  alignItems: "center",
+   backgroundColor: "#aaf5bdff",
+   borderColor: "#9ad5dfff",
   },
   itemLista: {
     width: "100%",

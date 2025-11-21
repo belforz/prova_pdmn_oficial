@@ -21,6 +21,9 @@ interface State {
   texto: string;
   imagem: fotoDia[];
   historico: ApodHistoricoItem[];
+  buscarFotos: { titulo: string; descricao: string; src: string }[];
+  anoAtual: string;
+  textoBusca: string; 
 }
 
 
@@ -30,7 +33,10 @@ export default class App extends React.Component<{}, State> {
     this.state = {
       texto: "",
       imagem: [],
-      historico: []
+      historico: [],
+      buscarFotos: [],
+      anoAtual: new Date().getFullYear().toString(),
+      textoBusca: ""
     };
   }
 
@@ -41,6 +47,7 @@ export default class App extends React.Component<{}, State> {
   carregarDados = async () => {
     await this.carregarHistorico();
     await this.trazerDoBackImagens();
+    await this.trazerFotosBusca(this.state.textoBusca, this.state.anoAtual);
   }
 
   carregarHistorico = async () => {
@@ -112,18 +119,31 @@ export default class App extends React.Component<{}, State> {
       }
   }
 
+  trazerFotosBusca = async (query: string, year: string) => {
+      const response = await nasaClient.get(`/search?q=${query}&year_start=${year}&year_end=${year}`);
+      const data = response.data.collection.items.slice(0, 10);
+      
+      const fotosBusca: { titulo: string; descricao: string; src: string }[] = [];
+      data.forEach((item: any) => {
+        fotosBusca.push({
+          titulo: item.data[0].title,
+          descricao: item.data[0].description,
+          src: item.links[0].href
+        });
+      })
+      this.setState({ buscarFotos: fotosBusca });
+  }
+
+  // eventos
+  
+  eventoDeMudanca = (evento: any) => {
+    this.setState({ texto: evento.nativeEvent.text });
+  }
+
+  
+
+
   render() {
-    const dataMockups = {
-      fotosBusca: [
-        { titulo: "titulo1", descricao: "alguma descricaos", src: "alguma url" },
-        { titulo: "titulo2", descricao: "alguma descricaos", src: "alguma url" },
-        { titulo: "titulo3", descricao: "alguma descricaos", src: "alguma url" },
-        { titulo: "titulo4", descricao: "alguma descricaos", src: "alguma url" }
-      ],
-      diasAno: ["2021","2022", "2023", "2024"],
-      anoAtual: "2025",
-      footerData: {nome: "Leandro Belfor"}
-    };
 
     return (
       <ScrollView contentContainerStyle={styles.container}>
@@ -143,13 +163,15 @@ export default class App extends React.Component<{}, State> {
             />
         <FotosDia imagem={this.state.imagem.map(img => ({ data: img.date, src: img.url , titulo: img.title }))}/>
         <BuscaFotos buscaFotos={{
-          textoBusca: this.state.texto,
-          setTextoBusca: (texto: string) => this.setState({ texto }),
-          ano: dataMockups.diasAno,
-          anoAtual: dataMockups.anoAtual,
-          buscarFotos: dataMockups.fotosBusca
-        }} />
-        <Footer nome={dataMockups.footerData.nome} />
+          textoBusca: this.state.textoBusca,
+          setTextoBusca:(text: string) => this.setState({ textoBusca: text }),
+          anoAtual: this.state.anoAtual,
+          buscarFotos: this.state.buscarFotos,
+          eventoDeMudanca: this.eventoDeMudanca,
+          onBuscar: (query: string, year: string) => { this.trazerFotosBusca(query, year);
+          
+           }}} />
+        <Footer nome={"Leandro Belfor"} />
         {/* <Figura tipo="solid" nome="hippo" cor="#49eebb" tamanho={50} sentido="horizontal"/> */}
         
       </ScrollView>
