@@ -38,11 +38,13 @@ app.get('/search', async(req, res) => {
     const nasaClientSemChave = axios.create({
         baseURL: 'https://images-api.nasa.gov'
     })
-    const termoBusca = req.query.query
+    const termoBusca = req.query.q
     const result = await nasaClientSemChave.get('/search', {
         params: {
             q: termoBusca,
-            media_type: 'image'
+            media_type: 'image',
+            year_start: req.query.year_start,
+            year_end: req.query.year_end
         }
     })
     console.log(result.data)
