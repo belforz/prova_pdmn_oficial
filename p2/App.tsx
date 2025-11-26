@@ -48,6 +48,7 @@ export default class App extends React.Component<{}, State> {
     };
   }
 
+  // ciclo de vida
   componentDidMount() {
     this.carregarDados();
   }
@@ -58,7 +59,7 @@ export default class App extends React.Component<{}, State> {
     await this.trazerDoBackImagens();
     await this.trazerFotosBusca(this.state.textoBusca, this.state.anoAtual);
   }
-
+  // como o estado é assincrono, garante o historico seja carregado antes de atualizar o estado da imagem com a foto do dia
   carregarHistorico = async () => {
       const historicoSalvo = await AsyncStorage.getItem('apodHistorico')
       if (historicoSalvo) {
@@ -76,7 +77,7 @@ export default class App extends React.Component<{}, State> {
 
   atualizarHistorico = (novaFoto: fotoDia) => {
     this.setState(antigoEstado => {
-    
+      // verificacao se a foto ja existe no historico, nao adiciona fotos duplicadas
       const jaExiste = antigoEstado.historico.filter(item => item.date === novaFoto.date);
       if (jaExiste && jaExiste.length > 0) {
         console.log('Fotos ja existe no histórico, não adicionando nenhuma nova foto');
@@ -90,13 +91,14 @@ export default class App extends React.Component<{}, State> {
           title: novaFoto.title 
         },
         ...antigoEstado.historico
-      ].slice(0, 3); 
+      ].slice(0, 3); // setei somente 3 fotos
 
       this.salvarHistorico(novoHistorico);
       return { historico: novoHistorico };
     });
   }
 
+  // facilitar a obtencao da data
   obterDataAtual = (): Date => {
     return new Date();
   }
@@ -105,16 +107,16 @@ export default class App extends React.Component<{}, State> {
       this.setState({ loadingDia: true });
       try {
         const hoje = this.obterDataAtual();
-        const fotosDoHistoricoData = this.state.historico.map(item => item.date);
-        const start_date = fotosDoHistoricoData.length > 0 ? fotosDoHistoricoData[fotosDoHistoricoData.length - 1] : hoje.toISOString().split('T')[0];
-        const end_date = hoje.toISOString().split('T')[0];
+        const fotosDoHistoricoData = this.state.historico.map(item => item.date); // extrai apenas as datas do historico 
+        const start_date = fotosDoHistoricoData.length > 0 ? fotosDoHistoricoData[fotosDoHistoricoData.length - 1] : hoje.toISOString().split('T')[0]; // se houver historico, pega a data mais antiga, senao pega a data de hoje
+        const end_date = hoje.toISOString().split('T')[0]; // data de hoje
         
         const response = await nasaClient.get(`/apod?start_date=${start_date}&end_date=${end_date}`);
         const data = response.data;
         console.log('Fotos buscadas:', data);
 
-        let dataArray = Array.isArray(data) ? data : [data];
-        const fotosDoDia: fotoDia[] = [];
+        let dataArray = Array.isArray(data) ? data : [data]; // garente que seja sempre um ARRAY, se usar a API com uma unica data, retorna um objeto e quebra o codigo
+        const fotosDoDia: fotoDia[] = []; // tipo definido para foto do dia
         dataArray.forEach((item: any) => {
           fotosDoDia.push({
             date: item.date,
@@ -123,14 +125,14 @@ export default class App extends React.Component<{}, State> {
           });
         });
         
-        const novasFotos = fotosDoDia.filter(foto => !this.state.imagem.filter(img => img.date === foto.date));
+        const novasFotos = fotosDoDia.filter(foto => !this.state.imagem.filter(img => img.date === foto.date)); // filtra apenas as fotos que nao estao no estado atual
         if (novasFotos.length > 0) {
-          this.setState({ imagem: [...this.state.imagem, ...novasFotos] });
+          this.setState({ imagem: [...this.state.imagem, ...novasFotos] }); // adiciona a nova foto ao estado
         }
 
         if (fotosDoDia.length > 0) {
-          const fotoMaisRecente = fotosDoDia[fotosDoDia.length - 1];
-          this.atualizarHistorico(fotoMaisRecente);
+          const fotoMaisRecente = fotosDoDia[fotosDoDia.length - 1]; // pega a foto mais recente do array
+          this.atualizarHistorico(fotoMaisRecente); // atualiza o historico com a foto mais recente
         }
       } catch (error) {
         console.error('Erro ao buscar imagens:', error);
@@ -142,8 +144,8 @@ export default class App extends React.Component<{}, State> {
   trazerFotosBusca = async (query: string, year: string) => {
       this.setState({ loadingBusca: true });
       try {
-        const response = await nasaClient.get(`/search?q=${query}&year_start=${year}&year_end=${year}`);
-        const data = response.data.collection.items.slice(0, 10);
+        const response = await nasaClient.get(`/search?q=${query}&year_start=${year}&year_end=${year}`); // busca fotos pela API
+        const data = response.data.collection.items.slice(0, 10); // so deis
         
         const fotosBusca: { titulo: string; descricao: string; src: string }[] = [];
         data.forEach((item: any) => {
@@ -164,7 +166,7 @@ export default class App extends React.Component<{}, State> {
   // eventos
   
   eventoDeMudanca = (evento: any) => {
-    this.setState({ texto: evento.nativeEvent.text });
+    this.setState({ textoBusca: evento.nativeEvent.text });
   }
 
   
