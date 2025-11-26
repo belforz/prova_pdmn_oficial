@@ -9,15 +9,18 @@ import nasaClient from './utils/nasaClient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Loading } from './components/static/Loading';
 
+// definicao de tipo
 interface fotoDia {
   date: string;
   url: string;
   title: string;
 }
 
+// historico de fotos
 interface ApodHistoricoItem extends fotoDia {
 }
 
+// definicao de estado classico no typescript
 interface State {
   texto: string;
   imagem: fotoDia[];
@@ -50,7 +53,8 @@ export default class App extends React.Component<{}, State> {
   }
 
   carregarDados = async () => {
-    await this.carregarHistorico();
+    const historico = await this.carregarHistorico();
+    this.setState({ imagem: historico });
     await this.trazerDoBackImagens();
     await this.trazerFotosBusca(this.state.textoBusca, this.state.anoAtual);
   }
@@ -58,9 +62,11 @@ export default class App extends React.Component<{}, State> {
   carregarHistorico = async () => {
       const historicoSalvo = await AsyncStorage.getItem('apodHistorico')
       if (historicoSalvo) {
-        const parsed = JSON.parse(historicoSalvo)
-        this.setState({ historico: parsed })
+        const historicoParseado = JSON.parse(historicoSalvo)
+        this.setState({ historico: historicoParseado })
+        return historicoParseado;
       }
+      return [];
   }
 
   salvarHistorico = async (novoHistorico: ApodHistoricoItem[]) => {
@@ -84,7 +90,7 @@ export default class App extends React.Component<{}, State> {
           title: novaFoto.title 
         },
         ...antigoEstado.historico
-      ].slice(0, 6);
+      ].slice(0, 3); 
 
       this.salvarHistorico(novoHistorico);
       return { historico: novoHistorico };
@@ -99,18 +105,17 @@ export default class App extends React.Component<{}, State> {
       this.setState({ loadingDia: true });
       try {
         const hoje = this.obterDataAtual();
-        const anteanteontem = new Date(hoje);
-        anteanteontem.setDate(hoje.getDate() - 6);
-        
-        const start_date = anteanteontem.toISOString().split('T')[0];
+        const fotosDoHistoricoData = this.state.historico.map(item => item.date);
+        const start_date = fotosDoHistoricoData.length > 0 ? fotosDoHistoricoData[fotosDoHistoricoData.length - 1] : hoje.toISOString().split('T')[0];
         const end_date = hoje.toISOString().split('T')[0];
         
         const response = await nasaClient.get(`/apod?start_date=${start_date}&end_date=${end_date}`);
         const data = response.data;
         console.log('Fotos buscadas:', data);
 
+        let dataArray = Array.isArray(data) ? data : [data];
         const fotosDoDia: fotoDia[] = [];
-        data.forEach((item: any) => {
+        dataArray.forEach((item: any) => {
           fotosDoDia.push({
             date: item.date,
             url: item.url,
@@ -118,11 +123,14 @@ export default class App extends React.Component<{}, State> {
           });
         });
         
-        this.setState({ imagem: fotosDoDia });
+        const novasFotos = fotosDoDia.filter(foto => !this.state.imagem.filter(img => img.date === foto.date));
+        if (novasFotos.length > 0) {
+          this.setState({ imagem: [...this.state.imagem, ...novasFotos] });
+        }
 
         if (fotosDoDia.length > 0) {
-          const fotoHoje = fotosDoDia[fotosDoDia.length - 1];
-          this.atualizarHistorico(fotoHoje);
+          const fotoMaisRecente = fotosDoDia[fotosDoDia.length - 1];
+          this.atualizarHistorico(fotoMaisRecente);
         }
       } catch (error) {
         console.error('Erro ao buscar imagens:', error);
